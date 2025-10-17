@@ -175,5 +175,15 @@
     </div>
     
     <script src="app.js"></script>
+
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    const el = document.querySelector('#preloader, .preloader, .loading, .splash, .loader, [data-preloader]');
+    if (el) { el.style.display = 'none'; }
+  }, 2500);
+});
+</script>
+
 </body>
 </html>
