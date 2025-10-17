@@ -1774,3 +1774,9 @@ input:focus-visible {
         scroll-behavior: auto !important;
     }
 }
+/* لا تنشئ صناديق فارغة كبيرة */
+.card:empty, .cement-card:empty, .tile:empty, .box:empty {
+  display: none !important;
+}
+.section-variants:has(.card:empty) .card:empty { display: none !important; }
+.section-variants { min-height: unset; }
