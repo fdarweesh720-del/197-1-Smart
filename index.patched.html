@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BS EN 197-1:2011 - Cement Standards Interactive Guide</title>
+    <meta name="description" content="Comprehensive interactive guide to BS EN 197-1:2011 cement standards covering all 39 cement types, constituents, and strength classes">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <link rel="stylesheet" href="style.css">
+    <style>
+      .main-title{ text-align:center; }
+    </style>
+
+</head>
+<body>
+    <div class="loading-screen" id="loadingScreen">
+        <div class="cement-mixer"></div>
+        <h2 style="color: var(--primary-blue); margin-bottom: 10px;">Loading Cement Standards...</h2>
+        <p style="color: var(--text-secondary);">BS EN 197-1:2011 Interactive Guide</p>
+    </div>
+    
+    <div class="progress-indicator">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+    
+    <header>
+        <nav>
+            <div class="logo">
+                <i class="fas fa-industry"></i>
+                Cement Standards
+            </div>
+            <ul class="nav-links">
+                <li><a href="#overview" class="nav-link active">Overview</a></li>
+                <li><a href="#cement-types" class="nav-link">Cement Types</a></li>
+                <li><a href="#constituents" class="nav-link">Constituents</a></li>
+                <li><a href="#strength-classes" class="nav-link">Strength Classes</a></li>
+                <li><a href="#requirements" class="nav-link">Chemical Requirements</a></li>
+            </ul>
+            <div class="nav-controls">
+                <button class="theme-toggle" id="themeToggle" title="Toggle dark/light theme"></button>
+                <div class="mobile-menu" id="mobileMenu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+    
+    <main>
+        <section class="hero" id="overview">
+            <h1 class="main-title">BS EN 197-1:2011</h1>
+            <p>Cement Part 1: Composition, specifications and conformity criteria for common cements</p>
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-number" id="totalTypesCount">39</span>
+                    <div class="stat-label">Cement Types</div>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">10</span>
+                    <div class="stat-label">Main Constituents</div>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">3</span>
+                    <div class="stat-label">Strength Classes</div>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">2011</span>
+                    <div class="stat-label">Published</div>
+                </div>
+            </div>
+        </section>
+        
+        <div class="search-container">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search cement types (CEM I, CEM II/A-S, etc.), constituents, or applications...">
+            <i class="fas fa-search search-icon"></i>
+        </div>
+        
+        <section class="section" id="cement-types">
+            <h2 style="text-align: center;">Cement Types</h2>
+            
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all" id="filterAll">All Types (39)</button>
+                <button class="filter-btn" data-filter="common" id="filterCommon">Common (27)</button>
+                <button class="filter-btn" data-filter="sulfate" id="filterSulfate">Sulfate Resistant (7)</button>
+                <button class="filter-btn" data-filter="low-early" id="filterLowEarly">Low Early Strength (5)</button>
+            </div>
+            
+            <div class="cards-grid" id="cementTypesGrid">
+                </div>
+        </section>
+        
+        <section class="section" id="constituents">
+            <h2>Main Constituents &amp; Composition</h2>
+            <div class="cards-grid" id="constituentsGrid">
+                </div>
+        </section>
+        
+        <section class="section" id="strength-classes">
+            <h2>Strength Classes - L/N/R Variants</h2>
+            
+            <div style="background: var(--color-bg-4); padding: 20px; border-radius: 12px; margin-bottom: 30px; border: 1px solid var(--border);">
+                <h3 style="color: var(--primary-blue); margin-bottom: 15px;"><i class="fas fa-exclamation-triangle" style="color: var(--accent-orange);"></i> Critical Correction</h3>
+                <p style="margin-bottom: 10px;"><strong>Strength classes are completely separate from cement types.</strong></p>
+                <p style="margin-bottom: 10px;"><strong>L (Low early strength):</strong> Only available for CEM III cements</p>
+                <p style="margin-bottom: 10px;"><strong>N (Normal early strength):</strong> Available for all cement types</p>
+                <p style="margin-bottom: 10px;"><strong>R (Rapid early strength):</strong> Available for all except CEM III-L combinations</p>
+                <p style="color: var(--text-secondary);">Chemical requirements are determined by cement TYPE, not strength class.</p>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="strengthChart"></canvas>
+            </div>
+            
+            <div class="cards-grid" id="strengthClassesGrid">
+                </div>
+        </section>
+        
+        <section class="section" id="requirements">
+            <h2>Chemical Requirements &amp; Standards</h2>
+            
+            <div class="chart-container">
+                <canvas id="compositionChart"></canvas>
+            </div>
+            
+            <div class="cards-grid" id="requirementsGrid">
+                </div>
+        </section>
+    </main>
+    
+    <footer class="credits">
+        <div class="credits-content">
+            <h3>Document Information &amp; Credits</h3>
+            <p><strong>BS EN 197-1:2011 - Cement Part 1</strong></p>
+            <p>Composition, specifications and conformity criteria for common cements</p>
+            <p>Published: 30 September 2011 | ISBN: 978 0 580 76786 9</p>
+            
+            <div class="credits-info">
+                <div class="credit-item">
+                    <h4>Prepared By</h4>
+                    <p><strong id="preparedBy">Mr. Fadi M. Darwesh</strong></p>
+                    <p>Email: <a href="mailto:asrar.cement@gmail.com" target="_blank" id="preparedEmail">asrar.cement@gmail.com</a></p>
+                    <p>Cement Standards Specialist</p>
+                    <p style="margin-top: 10px; color: var(--accent-orange); font-weight: 500;">All data verified against BS EN 197-1:2011 original standard</p>
+                </div>
+                <div class="credit-item">
+                    <h4>Checked &amp; Approved By</h4>
+                    <p><strong id="checkedBy">Mr.Emil E.Batarseh</strong></p>
+                    <p id="checkedTitle">Director of Northern Cement Laboratories</p>
+                    <p>Quality Assurance &amp; Standards Compliance</p>
+                    <p style="margin-top: 10px; color: var(--primary-blue); font-weight: 500;">Technical Review &amp; Validation Complete</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px; padding: 20px; background: var(--color-bg-1); border-radius: 10px; border: 1px solid var(--border);">
+                <h4 style="color: var(--primary-blue); margin-bottom: 10px;">Standard Coverage</h4>
+                <p style="margin-bottom: 8px;"><strong>27 distinct common cements</strong></p>
+                <p style="margin-bottom: 8px;"><strong>7 sulfate resisting common cements</strong></p>
+                <p style="margin-bottom: 8px;"><strong>3 distinct low early strength blast furnace cements</strong></p>
+                <p style="margin-bottom: 15px;"><strong>2 sulfate resisting low early strength blast furnace cements</strong></p>
+                <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                    This interactive guide supersedes BS EN 197-1:2000 and BS EN 197-4:2004
+                </p>
+            </div>
+        </div>
+    </footer>
+    
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <span class="modal-close" id="modalClose">&times;</span>
+            <div id="modalContent">
+                </div>
+        </div>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
