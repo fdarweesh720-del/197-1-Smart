@@ -1,69 +1,18 @@
 
-// === Injected by Assistant: SO3 limit resolver by cement TYPE (EN 197-1) ===
-// type example: "CEM II/B-T", class example: "42.5 R"
-async function getSO3Limit(type, strengthClass) {
-    const req = await loadChemicalRequirements();
-    if (!req) return null;
-    const t = String(type || '').toUpperCase().replace('\u00A0',' ').trim();
-    const classKey = String(strengthClass || '').replace('.', '_').replace(' ', '_').toUpperCase(); // e.g., "42_5_R"
-    if (t.startsWith('CEM I') && req.CEM_I) {
-        // Map specific class keys if provided, else default 3.5/4.0 logic
-        const byClass = req.CEM_I.sulfate_content || {};
-        return byClass[classKey] || byClass['42_5_R'] || '≤ 4.0%';
-    }
-    if (t.startsWith('CEM III') && req.CEM_III) {
-        const byClass = req.CEM_III.sulfate_content || {};
-        return byClass.all_classes || '≤ 4.5%';
-    }
-    if (t.startsWith('CEM II') && req.CEM_II) {
-        const byClass = req.CEM_II.sulfate_content || {};
-        // Special cases for CEM II/B-T and CEM II/B-M with T>20
-        if (t.includes('CEM II/B-T') || (t.includes('CEM II/B-M') && /T\s*\>\s*20/i.test(t))) {
-            const spec = req.CEM_II.special_cases || {};
-            return spec.CEM_II_B_T || spec.CEM_II_B_M_with_T_over_20 || '≤ 4.5% SO3 (all classes)';
-        }
-        return byClass[classKey] || '≤ 4.0%';
-    }
-    if (t.startsWith('CEM IV') && req.CEM_IV) {
-        const byClass = req.CEM_IV.sulfate_content || {};
-        return byClass[classKey] || '≤ 4.0%';
-    }
-    if (t.startsWith('CEM V') && req.CEM_V) {
-        const byClass = req.CEM_V.sulfate_content || {};
-        return byClass[classKey] || '≤ 4.0%';
-    }
-    return null;
+// === Injected: Availability resolver to avoid accidental blocking of R for CEM III ===
+function getAllowedVariantsByTypeAndClass(type, strengthClass) {
+  const t = String(type||'').toUpperCase();
+  // Default availability
+  let allowed = ['N','R'];
+  if (t.startsWith('CEM III')) {
+    // CEM III: L + N + R are valid; do NOT block R.
+    allowed = ['L','N','R'];
+  }
+  return allowed;
 }
-
-
-// === Injected by Assistant: Load corrected chemical requirements JSON ===
-async function loadChemicalRequirements() {
-    try {
-        const resp = await fetch('corrected_chemical_requirements.json');
-        if (!resp.ok) throw new Error('Failed to load chemical requirements JSON');
-        const data = await resp.json();
-        return data.chemical_requirements_by_type_and_class || data;
-    } catch (e) {
-        console.error('Error loading chemical requirements:', e);
-        return null;
-    }
-}
-
-
-// === Injected by Assistant: Strength class rules (EN 197-1) ===
-function normalizeStrengthVariants(variant) {
-    // Map lowercase/typos to uppercase canonical keys
-    if(!variant) return variant;
-    const v = String(variant).trim().toUpperCase();
-    return (v === 'L' || v === 'N' || v === 'R') ? v : variant;
-}
-function allowedStrengthVariantsForType(type) {
-    const t = String(type || '').toUpperCase();
-    if (t.startsWith('CEM III')) return ['L','N','R']; // but UI must avoid CEM III-L + R combo conflicts in datasets
-    return ['N','R'];
-}
-function isLAllowed(type) {
-    return String(type || '').toUpperCase().startsWith('CEM III');
+function isVariantAllowed(type, strengthClass, variant){
+  const v = String(variant||'').toUpperCase().trim();
+  return getAllowedVariantsByTypeAndClass(type, strengthClass).includes(v);
 }
 
 // Application Data - Original Structure Preserved
