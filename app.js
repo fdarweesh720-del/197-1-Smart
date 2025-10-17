@@ -1,17 +1,39 @@
 
-// === Availability override (safe) ===
-function getAllowedVariantsByTypeAndClass(type, strengthClass){
+// === HARD OVERRIDE (injected by Assistant) ===
+function __allowedVariantsByType(type){
   const T = String(type||'').toUpperCase();
-  // Default for all types: N and R
-  let allowed = ['N','R'];
-  // For CEM III: add L as an additional valid variant (do NOT block R)
-  if (T.startsWith('CEM III')) allowed = ['L','N','R'];
-  return allowed;
+  if (!T.startsWith('CEM III')) return ['N','R'];
+  return ['L','N','R']; // All CEM III families (incl. SR)
 }
 function isVariantAllowed(type, strengthClass, variant){
   const v = String(variant||'').trim().toUpperCase();
-  return getAllowedVariantsByTypeAndClass(type, strengthClass).includes(v);
+  return __allowedVariantsByType(type).includes(v);
 }
+// UI healer to flip any stale 'x' to '✓' for CEM III variants (L/N/R)
+(function(){
+  function heal(container){
+    if(!container) return;
+    const titleEl = container.querySelector('h1,h2,h3');
+    const title = titleEl ? titleEl.textContent.toUpperCase() : '';
+    if(!title.includes('CEM III')) return;
+    container.querySelectorAll('.card, .variant, .box, .tile, .badge').forEach(el=>{
+      if(/\b(L|N|R)\b/.test((el.textContent||'').toUpperCase())){
+        ['disabled','muted','dim','not-available','is-disabled'].forEach(c=>el.classList.remove(c));
+        el.innerHTML = el.innerHTML.replace(/(\b(L|N|R)\b[^<]*)(?:x|✗)/g, r'\1 ✓');
+      }
+    });
+  }
+  const mo = new MutationObserver(muts=>{
+    for(const m of muts){
+      for(const n of m.addedNodes||[]){
+        if(n.nodeType===1){ heal(n); }
+      }
+    }
+  });
+  mo.observe(document.documentElement, {childList:true, subtree:true});
+  window.addEventListener('load', ()=>{ heal(document); });
+})();
+
 // Application Data - Original Structure Preserved
 const cementData = {
     // Separate strength classes with ALL variants (N, R, L)
@@ -1547,42 +1569,3 @@ function initializeMobileMenu() {
         mobileMenu.classList.toggle('active');
     });
 }
-
-// === UI Post-fix to ensure R is shown for CEM III ===
-(function(){
-  function fixModal(container){
-    if(!container) return;
-    const header = container.querySelector('h1,h2,h3');
-    const title = header ? header.textContent.toUpperCase() : '';
-    if(title.startsWith('CEM III')){
-      // Flip any text like 'R x' -> 'R ✓' and remove disabled classes
-      container.querySelectorAll('*').forEach(el=>{
-        const t = (el.textContent||'').toUpperCase();
-        if(/\bR\b/.test(t)){
-          // Replace trailing 'x' with a check if exists in the same node
-          el.textContent = el.textContent.replace(/(\bR\b\s*)x\b/g, '$1✓');
-          // Remove common 'disabled' classes
-          el.classList && ['disabled','muted','dim','not-available'].forEach(c=>el.classList.remove(c));
-        }
-      });
-    }
-  }
-  // Observe for modals/details opening
-  const mo = new MutationObserver((muts)=>{
-    muts.forEach(m=>{
-      m.addedNodes && m.addedNodes.forEach(node=>{
-        if(node.nodeType===1){
-          if(node.matches && (node.matches('.modal, .dialog, [role="dialog"]') || node.querySelector('h1,h2,h3'))){
-            fixModal(node);
-          }
-        }
-      });
-    });
-  });
-  mo.observe(document.documentElement, {childList:true, subtree:true});
-  // Also run once on load for any already-open details
-  window.addEventListener('load', ()=>{
-    document.querySelectorAll('.modal, .dialog, [role="dialog"], .details, .sheet').forEach(fixModal);
-  });
-})();
-
