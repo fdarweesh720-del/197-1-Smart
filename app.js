@@ -1,20 +1,17 @@
 
-// === Injected: Availability resolver to avoid accidental blocking of R for CEM III ===
-function getAllowedVariantsByTypeAndClass(type, strengthClass) {
-  const t = String(type||'').toUpperCase();
-  // Default availability
+// === Availability override (safe) ===
+function getAllowedVariantsByTypeAndClass(type, strengthClass){
+  const T = String(type||'').toUpperCase();
+  // Default for all types: N and R
   let allowed = ['N','R'];
-  if (t.startsWith('CEM III')) {
-    // CEM III: L + N + R are valid; do NOT block R.
-    allowed = ['L','N','R'];
-  }
+  // For CEM III: add L as an additional valid variant (do NOT block R)
+  if (T.startsWith('CEM III')) allowed = ['L','N','R'];
   return allowed;
 }
 function isVariantAllowed(type, strengthClass, variant){
-  const v = String(variant||'').toUpperCase().trim();
+  const v = String(variant||'').trim().toUpperCase();
   return getAllowedVariantsByTypeAndClass(type, strengthClass).includes(v);
 }
-
 // Application Data - Original Structure Preserved
 const cementData = {
     // Separate strength classes with ALL variants (N, R, L)
@@ -1550,3 +1547,42 @@ function initializeMobileMenu() {
         mobileMenu.classList.toggle('active');
     });
 }
+
+// === UI Post-fix to ensure R is shown for CEM III ===
+(function(){
+  function fixModal(container){
+    if(!container) return;
+    const header = container.querySelector('h1,h2,h3');
+    const title = header ? header.textContent.toUpperCase() : '';
+    if(title.startsWith('CEM III')){
+      // Flip any text like 'R x' -> 'R ✓' and remove disabled classes
+      container.querySelectorAll('*').forEach(el=>{
+        const t = (el.textContent||'').toUpperCase();
+        if(/\bR\b/.test(t)){
+          // Replace trailing 'x' with a check if exists in the same node
+          el.textContent = el.textContent.replace(/(\bR\b\s*)x\b/g, '$1✓');
+          // Remove common 'disabled' classes
+          el.classList && ['disabled','muted','dim','not-available'].forEach(c=>el.classList.remove(c));
+        }
+      });
+    }
+  }
+  // Observe for modals/details opening
+  const mo = new MutationObserver((muts)=>{
+    muts.forEach(m=>{
+      m.addedNodes && m.addedNodes.forEach(node=>{
+        if(node.nodeType===1){
+          if(node.matches && (node.matches('.modal, .dialog, [role="dialog"]') || node.querySelector('h1,h2,h3'))){
+            fixModal(node);
+          }
+        }
+      });
+    });
+  });
+  mo.observe(document.documentElement, {childList:true, subtree:true});
+  // Also run once on load for any already-open details
+  window.addEventListener('load', ()=>{
+    document.querySelectorAll('.modal, .dialog, [role="dialog"], .details, .sheet').forEach(fixModal);
+  });
+})();
+

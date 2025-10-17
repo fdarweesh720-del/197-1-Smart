@@ -12,39 +12,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <link rel="stylesheet" href="style.css">
-
-<style>
-:root { --anim-ease: cubic-bezier(.2,.8,.2,1); }
-.reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s var(--anim-ease), transform .7s var(--anim-ease); }
-.reveal.in-view { opacity: 1; transform: translateY(0); }
-.card, .cement-card, .tile, .box {
-  transition: transform .25s var(--anim-ease), box-shadow .25s var(--anim-ease);
-  will-change: transform;
-}
-.card:hover, .cement-card:hover, .tile:hover, .box:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 30px rgba(0,0,0,.12);
-}
-.hero {
-  background: linear-gradient(135deg, #189ab4, #007b83);
-  position: relative;
-  overflow: hidden;
-}
-.hero::after {
-  content: "";
-  position: absolute; inset: 0;
-  background: radial-gradient(600px 200px at -10% -10%, rgba(255,255,255,.15), transparent 50%),
-              radial-gradient(500px 160px at 120% 120%, rgba(255,255,255,.10), transparent 60%);
-  pointer-events: none;
-  mix-blend-mode: screen;
-  animation: shimmer 8s linear infinite;
-}
-@keyframes shimmer { 
-  0% { transform: translateX(-10%); } 
-  100% { transform: translateX(10%); } 
-}
-</style>
-
 </head>
 <body>
     <div class="loading-screen" id="loadingScreen">
@@ -82,7 +49,7 @@
     </header>
     
     <main>
-        <section class="hero reveal" id="overview">
+        <section class="hero" id="overview">
             <h1>BS EN 197-1:2011</h1>
             <p>Cement Part 1: Composition, specifications and conformity criteria for common cements</p>
             <div class="hero-stats">
@@ -179,7 +146,7 @@
                 </div>
                 <div class="credit-item">
                     <h4>Checked &amp; Approved By</h4>
-                    <p></p>
+                    <p><strong id="checkedBy">Mr.Emil E.Batarseh</strong></p>
                     <p id="checkedTitle">Director of Northern Cement Laboratories</p>
                     <p>Quality Assurance &amp; Standards Compliance</p>
                     <p style="margin-top: 10px; color: var(--primary-blue); font-weight: 500;">Technical Review &amp; Validation Complete</p>
@@ -208,17 +175,5 @@
     </div>
     
     <script src="app.js"></script>
-
-<script>
-(function() {
-  const io = new IntersectionObserver((entries)=>{
-    entries.forEach(e => {
-      if (e.isIntersecting) { e.target.classList.add('in-view'); io.unobserve(e.target); }
-    });
-  }, {threshold: .12});
-  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
-})();
-</script>
-
 </body>
 </html>
