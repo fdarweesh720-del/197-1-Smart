@@ -1,3 +1,26 @@
+// === Minimal Availability Fix (safe) ===
+(function () {
+  function allowedByType(type) {
+    const T = String(type || '').toUpperCase();
+    // جميع الأنواع غير CEM III: N و R متاحتان
+    if (!T.startsWith('CEM III')) return ['N', 'R'];
+    // كل عائلات CEM III (بما فيها SR): L/N/R
+    return ['L', 'N', 'R'];
+  }
+
+  // لفّ دالة المشروع الأصلية إن وُجدت؛ وإلا وفّر بديلًا متوافقًا
+  const oldIsAllowed = (typeof window !== 'undefined' && window.isVariantAllowed)
+    ? window.isVariantAllowed
+    : null;
+
+  window.isVariantAllowed = function (type, strengthClass, variant) {
+    const v = String(variant || '').trim().toUpperCase();
+    const allow = allowedByType(type);
+    if (allow.includes(v)) return true;          // نضمن L/N/R في CEM III
+    return oldIsAllowed ? oldIsAllowed(type, strengthClass, v) : false;
+  };
+})();
+
 // Application Data - Original Structure Preserved
 const cementData = {
     // Separate strength classes with ALL variants (N, R, L)
